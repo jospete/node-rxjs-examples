@@ -1,14 +1,45 @@
-import { emitKeypressEvents } from 'readline';
+import { EventEmitter } from 'events';
 
-const inputStream = process.stdin;
+import { random } from './util';
 
-emitKeypressEvents(inputStream);
-inputStream.setRawMode(true);
+// Vanilla event handler from NodeJS
+const emitter = new EventEmitter();
 
-inputStream.on('keypress', (str: string, metadata: any) => {
-	console.log('keypress event values: ', str, metadata);
-	if (metadata.name === 'c' && metadata.ctrl) {
-		console.log('received process exit event');
-		process.exit(0);
+// Keep track of progress outside of handler so we can reference it elsewhere
+let progress = 0;
+let intervalId: any = null;
+
+// Handles 'progress' events emitted by the emitter instance
+const handleProgressUpdate = (value: number) => {
+
+	progress += value;
+	console.log('[EVENT] progress - ' + value + ' -> ' + progress);
+
+	if (progress >= 100) {
+
+		console.log('handleProgressUpdate() complete! -> ' + progress);
+		progress = 100;
+
+		// We will continue to recive progress events util we manually remove the handler callback
+		emitter.removeListener('progress', handleProgressUpdate);
+		emitter.emit('complete');
 	}
+};
+
+// Register the progress handler
+emitter.on('progress', handleProgressUpdate);
+
+// Intercept a single 'complete' event - the handler will un-register itself after one emission.
+emitter.once('complete', () => {
+	console.log('[EVENT] complete - ' + progress);
+	clearInterval(intervalId);
 });
+
+// Source for triggering event emissions.
+// Needs to be turned off manually via clearInterval() later.
+// Notice we are defining the source last... and the "operator" mechanisms need to be ordered in reverse.
+intervalId = setInterval(() => {
+	const nextProgress = random(1, 10);
+	console.log('nextProgress = ' + nextProgress);
+	emitter.emit('progress', nextProgress);
+}, 300);
