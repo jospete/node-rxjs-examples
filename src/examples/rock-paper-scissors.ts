@@ -11,6 +11,11 @@ enum GameChoice {
 	scissors = 'scissors'
 }
 
+const winConditionMap = new Map<GameChoice, GameChoice>()
+	.set(GameChoice.rock, GameChoice.scissors)
+	.set(GameChoice.scissors, GameChoice.paper)
+	.set(GameChoice.paper, GameChoice.rock);
+
 const pickRandomChoice = (): GameChoice => {
 	const choices = [
 		GameChoice.rock,
@@ -20,39 +25,23 @@ const pickRandomChoice = (): GameChoice => {
 	return choices[random(0, choices.length)];
 };
 
-const winConditionMap = new Map<GameChoice, GameChoice>()
-	.set(GameChoice.rock, GameChoice.scissors)
-	.set(GameChoice.scissors, GameChoice.paper)
-	.set(GameChoice.paper, GameChoice.rock);
-
-// Returns -1 if "a" wins
-// Returns 1 if "b" wins
-// Returns 0 on draw
-const compareGameChoice = (a: GameChoice, b: GameChoice): number => {
-	if (winConditionMap.get(a) == b) return -1;
-	if (winConditionMap.get(b) == a) return 1;
-	return 0;
-};
-
-const playGame = (playerInput: string): void => {
+const playGame = (playerPick: GameChoice): void => {
 
 	const computerPick = pickRandomChoice();
-	console.log('player chose ' + playerInput);
+	console.log('player chose ' + playerPick);
 	console.log('computer chose ' + computerPick);
 
-	const result = compareGameChoice(playerInput as any, computerPick);
-
-	switch (result) {
-		case -1:
-			console.log('you won!');
-			break;
-		case 1:
-			console.log('you lose :(');
-			break;
-		default:
-			console.log('tie');
-			break;
+	if (winConditionMap.get(playerPick) == computerPick) {
+		console.log('you won!');
+		return;
 	}
+
+	if (winConditionMap.get(computerPick) == playerPick) {
+		console.log('you lose :(');
+		return;
+	}
+
+	console.log('tie');
 };
 
 const isValidGameChoice = (input: string): boolean => {
@@ -95,7 +84,7 @@ const source = merge(
 	repeatInfinite(() => requestGameChoice)
 ).pipe(
 	takeWhile(v => v !== 'quit'),
-	tap(v => playGame(v))
+	tap(v => playGame(v as any))
 );
 
 source.subscribe({
