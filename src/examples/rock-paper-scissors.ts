@@ -52,12 +52,26 @@ const winConditionToString = (a: GameChoice, b: GameChoice, condition: WinCondit
 	return a + ' ' + condition.verb + ' ' + b;
 };
 
+const isWinCondition = (a: GameChoice, b: GameChoice, message: string): boolean => {
+
+	const condition = findWinCondition(a, b);
+	const exists = !!condition;
+
+	if (exists) console.log(message + ' - ' + winConditionToString(a, b, condition!));
+
+	return exists;
+};
+
 const pickRandomChoice = (): GameChoice => {
+
 	const choices = [
 		GameChoice.rock,
 		GameChoice.paper,
-		GameChoice.scissors
+		GameChoice.scissors,
+		GameChoice.lizard,
+		GameChoice.spock
 	];
+
 	return choices[random(0, choices.length)];
 };
 
@@ -69,17 +83,11 @@ const playGame = (playerPick: GameChoice): void => {
 	console.log('  player choice = ' + playerPick);
 	console.log('computer choice = ' + computerPick);
 
-	const playerWinCondition = findWinCondition(playerPick, computerPick);
-
-	if (playerWinCondition) {
-		console.log('you won! - ' + winConditionToString(playerPick, computerPick, playerWinCondition));
+	if (isWinCondition(playerPick, computerPick, 'you won!')) {
 		return;
 	}
 
-	const computerWinCondition = findWinCondition(computerPick, playerPick);
-
-	if (computerWinCondition) {
-		console.log('you lose :( - ' + winConditionToString(computerPick, playerPick, computerWinCondition));
+	if (isWinCondition(computerPick, playerPick, 'you lose :(')) {
 		return;
 	}
 
@@ -107,7 +115,10 @@ const errors = merge(
 	})
 );
 
-const requestGameChoice: Observable<string> = defer(() => ask('options = ' + JSON.stringify(getValidGameInputs()) + ': ')).pipe(
+const requestGameChoice: Observable<string> = defer(() => {
+	const question = 'options = ' + JSON.stringify(getValidGameInputs()) + ': ';
+	return ask(question);
+}).pipe(
 	assertValueConstraint(isValidGameInput, v => 'invalid choice "' + v + '"'),
 	retryAfterDelay(250)
 );
