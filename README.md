@@ -14,4 +14,5 @@ ts-node src/[path/to/file].ts
 3. [Hot vs Cold Observables](https://github.com/jospete/node-rxjs-examples/blob/master/src/hot-vs-cold-observables.ts)
 4. [Observables vs Subjects](https://github.com/jospete/node-rxjs-examples/blob/master/src/observables-vs-subjects.ts)
 5. [Unicast vs Multicast](https://github.com/jospete/node-rxjs-examples/blob/master/src/unicast-vs-multicast.ts)
-6. [Number Array Input Example](https://github.com/jospete/node-rxjs-examples/blob/master/src/examples/number-array-input.ts)
+6. [Operators](https://github.com/jospete/node-rxjs-examples/blob/master/src/operators.ts)
+7. [Number Array Input Example](https://github.com/jospete/node-rxjs-examples/blob/master/src/examples/number-array-input.ts)
