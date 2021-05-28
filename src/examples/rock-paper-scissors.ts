@@ -8,17 +8,49 @@ import { assertValueConstraint, repeatInfinite, retryAfterDelay } from './exampl
 enum GameChoice {
 	rock = 'rock',
 	paper = 'paper',
-	scissors = 'scissors'
+	scissors = 'scissors',
+	lizard = 'lizard',
+	spock = 'spock'
 }
+
+interface WinCondition {
+	target: GameChoice;
+	verb: string;
+}
+
+const winConditionMap = new Map<GameChoice, WinCondition[]>()
+	.set(GameChoice.scissors, [
+		{ target: GameChoice.paper, verb: 'cuts' },
+		{ target: GameChoice.lizard, verb: 'decapitates' }
+	])
+	.set(GameChoice.paper, [
+		{ target: GameChoice.rock, verb: 'covers' },
+		{ target: GameChoice.spock, verb: 'disproves' }
+	])
+	.set(GameChoice.rock, [
+		{ target: GameChoice.scissors, verb: 'crushes' },
+		{ target: GameChoice.lizard, verb: 'crushes' }
+	])
+	.set(GameChoice.lizard, [
+		{ target: GameChoice.spock, verb: 'poisons' },
+		{ target: GameChoice.paper, verb: 'eats' }
+	])
+	.set(GameChoice.spock, [
+		{ target: GameChoice.scissors, verb: 'smashes' },
+		{ target: GameChoice.rock, verb: 'vaporizes' }
+	]);
 
 const quitCommand = 'quit';
 const getValidGameInputs = () => Object.values(GameChoice as any).concat([quitCommand]);
 const isValidGameInput = (input: string): boolean => getValidGameInputs().includes(input);
 
-const winConditionMap = new Map<GameChoice, GameChoice>()
-	.set(GameChoice.rock, GameChoice.scissors)
-	.set(GameChoice.scissors, GameChoice.paper)
-	.set(GameChoice.paper, GameChoice.rock);
+const findWinCondition = (a: GameChoice, b: GameChoice): WinCondition | undefined => {
+	return winConditionMap.get(a)?.find(v => v.target === b);
+};
+
+const winConditionToString = (a: GameChoice, b: GameChoice, condition: WinCondition): string => {
+	return a + ' ' + condition.verb + ' ' + b;
+};
 
 const pickRandomChoice = (): GameChoice => {
 	const choices = [
@@ -32,20 +64,26 @@ const pickRandomChoice = (): GameChoice => {
 const playGame = (playerPick: GameChoice): void => {
 
 	const computerPick = pickRandomChoice();
-	console.log('player chose ' + playerPick);
-	console.log('computer chose ' + computerPick);
 
-	if (winConditionMap.get(playerPick) === computerPick) {
-		console.log('you won!');
+	console.log('------------ GAME ------------');
+	console.log('  player choice = ' + playerPick);
+	console.log('computer choice = ' + computerPick);
+
+	const playerWinCondition = findWinCondition(playerPick, computerPick);
+
+	if (playerWinCondition) {
+		console.log('you won! - ' + winConditionToString(playerPick, computerPick, playerWinCondition));
 		return;
 	}
 
-	if (winConditionMap.get(computerPick) === playerPick) {
-		console.log('you lose :(');
+	const computerWinCondition = findWinCondition(computerPick, playerPick);
+
+	if (computerWinCondition) {
+		console.log('you lose :( - ' + winConditionToString(computerPick, playerPick, computerWinCondition));
 		return;
 	}
 
-	console.log('tie');
+	console.log('draw');
 };
 
 const rl = createInterface({
