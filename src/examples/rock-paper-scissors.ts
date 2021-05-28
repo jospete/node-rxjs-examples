@@ -56,29 +56,20 @@ const rl = createInterface({
 // Helper for turning readline function into a promise
 const ask = (question: string): Promise<string> => new Promise(resolve => rl.question(question, resolve));
 
-// Save events as references instead of strings
-const pause = fromEvent(rl, 'pause');
-const close = fromEvent(rl, 'close');
-
-// If either pause or close get called, consider them an error
 const errors = merge(
-	pause.pipe(mapTo('PAUSED')),
-	close.pipe(mapTo('CLOSED'))
+	fromEvent(rl, 'pause').pipe(mapTo('PAUSED')),
+	fromEvent(rl, 'close').pipe(mapTo('CLOSED'))
 ).pipe(
 	tap(v => {
 		throw new Error(v);
 	})
 );
 
-// 1. Ask user to input a number
 const requestGameChoice: Observable<string> = defer(() => ask('options = ' + JSON.stringify(getValidGameInputs()) + ': ')).pipe(
 	assertValueConstraint(isValidGameInput, v => 'invalid choice "' + v + '"'),
 	retryAfterDelay(250)
 );
 
-// Our source will be the "happy path" flow combined with possible errors that can occur.
-// The stream and all its corresponding callbacks are guaranteed to be cleaned up automatically when
-// the stream terminates (i.e. "complete" or "error" conditions are met).
 const source = merge(
 	errors,
 	repeatInfinite(() => requestGameChoice)
