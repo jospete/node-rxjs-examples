@@ -31,12 +31,12 @@ const playGame = (playerPick: GameChoice): void => {
 	console.log('player chose ' + playerPick);
 	console.log('computer chose ' + computerPick);
 
-	if (winConditionMap.get(playerPick) == computerPick) {
+	if (winConditionMap.get(playerPick) === computerPick) {
 		console.log('you won!');
 		return;
 	}
 
-	if (winConditionMap.get(computerPick) == playerPick) {
+	if (winConditionMap.get(computerPick) === playerPick) {
 		console.log('you lose :(');
 		return;
 	}
