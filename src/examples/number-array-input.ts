@@ -8,9 +8,7 @@ const rl = createInterface({
 });
 
 // Helper for turning readline function into a promise
-const ask = (question: string): Promise<string> => {
-	return new Promise(resolve => rl.question(question, resolve));
-};
+const ask = (question: string): Promise<string> => new Promise(resolve => rl.question(question, resolve));
 
 // Save events as references instead of strings
 const pause = fromEvent(rl, 'pause');
