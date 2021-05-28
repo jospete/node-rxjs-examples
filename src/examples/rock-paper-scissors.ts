@@ -11,6 +11,10 @@ enum GameChoice {
 	scissors = 'scissors'
 }
 
+const quitCommand = 'quit';
+const getValidGameInputs = () => Object.values(GameChoice as any).concat([quitCommand]);
+const isValidGameInput = (input: string): boolean => getValidGameInputs().includes(input);
+
 const winConditionMap = new Map<GameChoice, GameChoice>()
 	.set(GameChoice.rock, GameChoice.scissors)
 	.set(GameChoice.scissors, GameChoice.paper)
@@ -44,10 +48,6 @@ const playGame = (playerPick: GameChoice): void => {
 	console.log('tie');
 };
 
-const isValidGameChoice = (input: string): boolean => {
-	return input === 'quit' || Object.values(GameChoice).includes(input as any);
-};
-
 const rl = createInterface({
 	input: process.stdin,
 	output: process.stdout
@@ -71,8 +71,8 @@ const errors = merge(
 );
 
 // 1. Ask user to input a number
-const requestGameChoice: Observable<string> = defer(() => ask('options = ["rock", "paper", "scissors", "quit"]: ')).pipe(
-	assertValueConstraint(isValidGameChoice, v => 'invalid choice "' + v + '"'),
+const requestGameChoice: Observable<string> = defer(() => ask('options = ' + JSON.stringify(getValidGameInputs()) + ': ')).pipe(
+	assertValueConstraint(isValidGameInput, v => 'invalid choice "' + v + '"'),
 	retryAfterDelay(250)
 );
 
@@ -83,7 +83,7 @@ const source = merge(
 	errors,
 	repeatInfinite(() => requestGameChoice)
 ).pipe(
-	takeWhile(v => v !== 'quit'),
+	takeWhile(v => v !== quitCommand),
 	tap(v => playGame(v as any))
 );
 
