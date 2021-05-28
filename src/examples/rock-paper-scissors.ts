@@ -94,6 +94,10 @@ const rl = createInterface({
 // Helper for turning readline function into a promise
 const ask = (question: string): Promise<string> => new Promise(resolve => rl.question(question, resolve));
 
+// -----------------------------------------------------------------------------
+// ------------------------- Relevant Observable Stuff -------------------------
+// -----------------------------------------------------------------------------
+
 const errors = merge(
 	fromEvent(rl, 'pause').pipe(mapTo('PAUSED')),
 	fromEvent(rl, 'close').pipe(mapTo('CLOSED'))
