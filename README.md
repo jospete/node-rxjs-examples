@@ -9,7 +9,7 @@ ts-node src/[path/to/file].ts
 
 ## Guide
 
-1. [Vanilla Callback Syntax](https://github.com/jospete/node-rxjs-examples/blob/master/src/event-callback-syntax.ts)
+1. [EventEmitter Syntax](https://github.com/jospete/node-rxjs-examples/blob/master/src/event-callback-syntax.ts)
 2. [Observable Syntax](https://github.com/jospete/node-rxjs-examples/blob/master/src/observable-syntax.ts)
 3. [Hot vs Cold Observables](https://github.com/jospete/node-rxjs-examples/blob/master/src/hot-vs-cold-observables.ts)
 4. [Observables vs Subjects](https://github.com/jospete/node-rxjs-examples/blob/master/src/observables-vs-subjects.ts)
